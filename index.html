@@ -106,6 +106,66 @@
         #drop-zone.hidden { display: none; }
         #drop-zone.dragover { background-color: rgba(0, 170, 255, 0.3); border-color: #fff; }
 
+        /* New styles for the online link box */
+        #online-link-container {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--glass-dark-bg-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border-color);
+            border-radius: 16px;
+            padding: 10px;
+            z-index: 11;
+            display: flex;
+            gap: 10px;
+            width: 50%;
+            max-width: 600px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        #online-link-container.hidden {
+            display: none;
+        }
+
+        #online-link-input {
+            flex-grow: 1;
+            background-color: var(--interactive-bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--glass-border-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-family: inherit;
+            font-size: 14px;
+            direction: ltr;
+            text-align: left;
+        }
+
+        #online-link-input::placeholder {
+            color: var(--text-color);
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        #play-online-link-btn {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        #play-online-link-btn:hover {
+            transform: scale(1.05);
+        }
+
+
         .controls-container {
             position: absolute; bottom: 0; left: 0; width: 100%; z-index: 5;
             opacity: 0; transition: opacity 0.3s ease-in-out, width 0.3s ease-in-out, margin-left 0.3s ease-in-out; background: none;
@@ -154,7 +214,22 @@
         #volume-filled::after { content: ''; position: absolute; right: 0; top: 50%; transform: translate(50%, -50%); width: 14px; height: 14px; background: var(--progress-filled-color); border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.2s ease; }
         .volume-container:hover #volume-filled::after { opacity: 1; }
 
-        #settings-panel { position: absolute; bottom: 85px; right: 20px; background-color: var(--glass-dark-bg-color); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 12px; padding: 20px; z-index: 6; display: none; width: 350px; border: 1px solid var(--glass-border-color); }
+        /* UPDATED: Settings Panel smaller and lower */
+        #settings-panel {
+            position: absolute;
+            bottom: 70px; /* Lowered */
+            right: 20px;
+            background-color: var(--glass-dark-bg-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 10px; /* Slightly smaller radius */
+            padding: 15px; /* Reduced padding */
+            z-index: 6;
+            display: none;
+            width: 315px; /* Reduced width */
+            border: 1px solid var(--glass-border-color);
+            font-size: 0.9em; /* Reduced base font size */
+        }
 
         #playlist-panel {
             position: fixed;
@@ -205,24 +280,37 @@
             margin-left: var(--playlist-width);
         }
 
+        /* UPDATED: Smaller slider thumbs */
         input[type="range"].subtitle-slider { -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; width: 100%; }
-        input[type="range"].subtitle-slider::-webkit-slider-runnable-track { background: var(--slider-track-highlight-color); height: 5px; border-radius: 5px; }
-        input[type="range"].subtitle-slider::-moz-range-track { background: var(--slider-track-highlight-color); height: 5px; border-radius: 5px; }
-        input[type="range"].subtitle-slider::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -5.5px; background-color: var(--progress-filled-color); height: 16px; width: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); }
-        input[type="range"].subtitle-slider::-moz-range-thumb { border: none; background-color: var(--progress-filled-color); height: 16px; width: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); }
+        input[type="range"].subtitle-slider::-webkit-slider-runnable-track { background: var(--slider-track-highlight-color); height: 4px; border-radius: 4px; }
+        input[type="range"].subtitle-slider::-moz-range-track { background: var(--slider-track-highlight-color); height: 4px; border-radius: 4px; }
+        input[type="range"].subtitle-slider::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -5px; background-color: var(--progress-filled-color); height: 14px; width: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); }
+        input[type="range"].subtitle-slider::-moz-range-thumb { border: none; background-color: var(--progress-filled-color); height: 14px; width: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); }
 
-        .settings-section { margin-bottom: 20px; border-bottom: 1px solid var(--glass-border-color); padding-bottom: 15px; }
+        .settings-section { margin-bottom: 15px; border-bottom: 1px solid var(--glass-border-color); padding-bottom: 12px; }
         .settings-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .settings-title { font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
-        .settings-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .settings-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
         .settings-row label { flex-basis: 40%; }
-        .settings-row select, .settings-row .options-container, .settings-row input[type="range"] { flex-basis: 60%; }
-        .settings-row select { background-color: var(--glass-bg-color); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); color: var(--text-color); border: 1px solid var(--glass-border-color); border-radius: 8px; padding: 5px; width: 100%; overflow: hidden; text-overflow: ellipsis; }
+        .settings-row select, .settings-row .options-container, .settings-row input[type="range"], #add-subtitle-btn { flex-basis: 60%; }
+        .settings-row select { background-color: var(--glass-bg-color); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); color: var(--text-color); border: 1px solid var(--glass-border-color); border-radius: 6px; padding: 4px; width: 100%; overflow: hidden; text-overflow: ellipsis; }
         .settings-row select option { background-color: var(--dropdown-option-bg); color: var(--text-color); }
-        .color-options button { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--text-color); cursor: pointer; margin: 0 2px; transition: transform 0.2s ease; }
+        
+        /* UPDATED: Smaller color buttons */
+        .color-options button { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--text-color); cursor: pointer; margin: 0 2px; transition: transform 0.2s ease; }
         .color-options button:hover { transform: scale(1.15); }
-        .direction-buttons button { background-color: var(--interactive-bg-color); color: var(--text-color); border: 1px solid var(--glass-border-color); border-radius: 5px; padding: 5px 10px; cursor: pointer; font-size: 12px; transition: background-color 0.2s ease; }
-        .direction-buttons button:hover:not(.active) { background-color: rgba(255, 255, 255, 0.2); }
+
+        .direction-buttons button, #add-subtitle-btn {
+            background-color: var(--interactive-bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--glass-border-color);
+            border-radius: 5px;
+            padding: 4px 8px; /* Reduced padding */
+            cursor: pointer;
+            font-size: 12px; /* Reduced font size */
+            transition: background-color 0.2s ease;
+        }
+        .direction-buttons button:hover:not(.active), #add-subtitle-btn:hover { background-color: rgba(255, 255, 255, 0.2); }
         .direction-buttons button.active { background-color: var(--accent-color); border-color: var(--accent-color); color: #fff; }
     </style>
 </head>
@@ -230,9 +318,14 @@
 
 <div id="playlist-panel"></div>
 <div id="playlist-resizer"></div>
+<input type="file" id="subtitle-file-input" hidden multiple accept=".srt,.vtt,.ass">
 
 <div class="player-container" id="player-container">
     <video id="video"></video>
+    <div id="online-link-container">
+        <input type="text" id="online-link-input" placeholder="آدرس ویدیوی آنلاین را وارد کنید">
+        <button id="play-online-link-btn">پخش</button>
+    </div>
     <div id="drop-zone"><p>فایل‌های ویدیو و زیرنویس را اینجا بکشید و رها کنید</p></div>
     <div class="subtitle-display" id="primary-subtitle-display"></div>
     <div class="subtitle-display" id="secondary-subtitle-display"></div>
@@ -245,7 +338,7 @@
                         <svg viewBox="0 0 24 24"><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/></svg>
                     </button>
                     <button class="control-button" id="settings-btn">
-                         <svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69-.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22-.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+                         <svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69-.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22-.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
                     </button>
                     <div class="volume-container">
                         <button class="control-button" id="mute-btn"></button>
@@ -285,6 +378,11 @@
                 <button data-value="dark" class="active">تاریک</button>
                 <button data-value="light">روشن</button>
             </div>
+        </div>
+        <!-- NEW: Add Subtitle Button -->
+        <div class="settings-row">
+            <label>افزودن زیرنویس:</label>
+            <button id="add-subtitle-btn">انتخاب فایل</button>
         </div>
     </div>
     <div class="settings-section">
@@ -401,9 +499,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextBtn = getElem('next-btn');
     const prevBtn = getElem('prev-btn');
     const themeSelector = getElem('theme-selector');
+    const onlineLinkContainer = getElem('online-link-container');
+    const onlineLinkInput = getElem('online-link-input');
+    const playOnlineLinkBtn = getElem('play-online-link-btn');
+    // New Elements for adding subtitles
+    const addSubtitleBtn = getElem('add-subtitle-btn');
+    const subtitleFileInput = getElem('subtitle-file-input');
 
     let loadedVideos = [], loadedSubtitles = [], currentVideoIndex = -1, activePrimaryCues = [], activeSecondaryCues = [], previousPlaybackRate = 1.0, isSecondarySubEnabled = false, controlsTimeout, displayRemainingTime = false, isSeeking = false, isVolumeSeeking = false;
-    const persianSubKeywords = ['persian', 'per', 'fa', 'farsi'];
+    const persianSubKeywords = ['persian', 'per', 'fa', 'farsi', 'فارسی'];
+    const englishSubKeywords = ['english', 'en', 'انگلیسی'];
     let primarySubPosition = { x: 0, y: 0 }, secondarySubPosition = { x: 0, y: 0 };
     const pressedKeys = new Set();
 
@@ -471,19 +576,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const settings = JSON.parse(localStorage.getItem('videoPlayerSettings'));
         if (!settings) return;
 
-        // Theme
         document.body.classList.toggle('light-theme', settings.theme === 'light');
         themeSelector.querySelector(`button[data-value="dark"]`).classList.toggle('active', settings.theme !== 'light');
         themeSelector.querySelector(`button[data-value="light"]`).classList.toggle('active', settings.theme === 'light');
 
-        // Player
         video.volume = settings.volume || 1;
         video.muted = settings.muted || false;
         video.playbackRate = settings.playbackRate || 1.0;
         speedDisplay.textContent = `${video.playbackRate.toFixed(1)}x`;
         displayRemainingTime = settings.displayRemainingTime || false;
         
-        // Primary Sub
         if (settings.primary) {
             primaryFontsizeSlider.value = parseInt(settings.primary.fontSize, 10) || 26;
             primarySubDisplay.style.fontSize = settings.primary.fontSize || '26px';
@@ -495,7 +597,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // Secondary Sub
         if (settings.secondary) {
             secondarySubToggle.checked = settings.secondary.enabled;
             isSecondarySubEnabled = settings.secondary.enabled;
@@ -549,6 +650,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (videoFiles.length > 0) {
             loadedVideos = videoFiles.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
             dropZone.classList.add('hidden');
+            onlineLinkContainer.classList.add('hidden');
             populatePlaylistUI();
         }
 
@@ -569,21 +671,47 @@ document.addEventListener('DOMContentLoaded', () => {
         currentVideoIndex = index;
         if (video.src.startsWith('blob:')) URL.revokeObjectURL(video.src);
         video.src = URL.createObjectURL(loadedVideos[index]);
+        video.load();
         video.play().catch(e => console.error("Playback failed:", e));
         updatePlaylistHighlight();
         updateNavButtons();
         autoSelectSubtitlesForCurrentVideo();
     };
 
+    // UPDATED: Logic split for single video vs playlist
     const autoSelectSubtitlesForCurrentVideo = () => {
         if (currentVideoIndex < 0 || loadedSubtitles.length === 0) return;
-        const videoBaseName = loadedVideos[currentVideoIndex].name.substring(0, loadedVideos[currentVideoIndex].name.lastIndexOf('.'));
-        const findSubIndex = isPersian => loadedSubtitles.findIndex(sub => persianSubKeywords.some(kw => sub.name.toLowerCase().includes(kw)) === isPersian && sub.name.toLowerCase().startsWith(videoBaseName.toLowerCase()));
-        primarySubSelect.value = findSubIndex(true);
-        primarySubSelect.dispatchEvent(new Event('change'));
-        if (isSecondarySubEnabled) {
-            secondarySubSelect.value = findSubIndex(false);
-            secondarySubSelect.dispatchEvent(new Event('change'));
+
+        // Logic for a single video file
+        if (loadedVideos.length === 1) {
+            const findSubIndexByKeywords = (keywords) => loadedSubtitles.findIndex(sub => keywords.some(kw => sub.name.toLowerCase().includes(kw)));
+            
+            const persianIndex = findSubIndexByKeywords(persianSubKeywords);
+            const englishIndex = findSubIndexByKeywords(englishSubKeywords);
+
+            if (persianIndex > -1) {
+                primarySubSelect.value = persianIndex;
+                primarySubSelect.dispatchEvent(new Event('change'));
+            }
+
+            if (englishIndex > -1) {
+                secondarySubToggle.checked = true;
+                secondarySubToggle.dispatchEvent(new Event('change')); // Trigger visibility
+                secondarySubSelect.value = englishIndex;
+                secondarySubSelect.dispatchEvent(new Event('change'));
+            }
+        // Logic for a playlist
+        } else {
+            const videoBaseName = loadedVideos[currentVideoIndex].name.substring(0, loadedVideos[currentVideoIndex].name.lastIndexOf('.'));
+            const findSubIndex = isPersian => loadedSubtitles.findIndex(sub => persianSubKeywords.some(kw => sub.name.toLowerCase().includes(kw)) === isPersian && sub.name.toLowerCase().startsWith(videoBaseName.toLowerCase()));
+            
+            primarySubSelect.value = findSubIndex(true);
+            primarySubSelect.dispatchEvent(new Event('change'));
+            
+            if (isSecondarySubEnabled) {
+                secondarySubSelect.value = findSubIndex(false);
+                secondarySubSelect.dispatchEvent(new Event('change'));
+            }
         }
     };
     
@@ -612,20 +740,34 @@ document.addEventListener('DOMContentLoaded', () => {
     dropZone.addEventListener('dragleave', e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
     dropZone.addEventListener('drop', e => { e.preventDefault(); handleFileDrop(e.dataTransfer.files); });
 
-    video.addEventListener('play', () => {
-        playPauseBtn.innerHTML = pauseIconSVG;
-        startControlsHideTimer();
+    playOnlineLinkBtn.addEventListener('click', () => {
+        const videoUrl = onlineLinkInput.value.trim();
+        if (videoUrl) {
+            try {
+                new URL(videoUrl);
+                loadedVideos = []; 
+                currentVideoIndex = -1;
+                populatePlaylistUI();
+                updateNavButtons();
+                loadedSubtitles = []; 
+                updateSubtitleSelectors();
+
+                video.src = videoUrl;
+                video.load();
+                video.play().catch(e => console.error("Online video playback failed:", e));
+                
+                onlineLinkContainer.classList.add('hidden');
+                dropZone.classList.add('hidden');
+            } catch (error) {
+                alert('لطفا یک آدرس اینترنتی معتبر وارد کنید.');
+                console.error("Invalid URL:", error);
+            }
+        }
     });
-    
-    video.addEventListener('pause', () => {
-        playPauseBtn.innerHTML = playIconSVG;
-        controlsContainer.classList.add('visible');
-        playerContainer.style.cursor = 'default';
-        clearTimeout(controlsTimeout);
-    });
-    
+
+    video.addEventListener('play', () => { playPauseBtn.innerHTML = pauseIconSVG; startControlsHideTimer(); });
+    video.addEventListener('pause', () => { playPauseBtn.innerHTML = playIconSVG; controlsContainer.classList.add('visible'); playerContainer.style.cursor = 'default'; clearTimeout(controlsTimeout); });
     video.addEventListener('ended', () => { if (!nextBtn.disabled) nextBtn.click(); });
-    
     video.addEventListener('timeupdate', () => {
         if (!isSeeking && video.duration) progressFilled.style.width = `${(video.currentTime / video.duration) * 100}%`;
         updateTimeDisplay();
@@ -640,7 +782,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     video.addEventListener('ratechange', saveSettings);
 
-
     playPauseBtn.addEventListener('click', () => video.paused ? video.play() : video.pause());
     nextBtn.addEventListener('click', () => loadVideo(currentVideoIndex - 1));
     prevBtn.addEventListener('click', () => loadVideo(currentVideoIndex + 1));
@@ -650,10 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerContainer.classList.toggle('playlist-active', isVisible);
     });
     
-    muteBtn.addEventListener('click', () => {
-        video.muted = !video.muted;
-        saveSettings();
-    });
+    muteBtn.addEventListener('click', () => { video.muted = !video.muted; saveSettings(); });
     
     const handleScrub = (e, barEl, callback) => {
         const rect = barEl.getBoundingClientRect(), percentage = Math.max(0, Math.min((e.clientX - rect.left) / rect.width, 1));
@@ -691,7 +829,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     playerContainer.addEventListener('mouseleave', () => { if (!video.paused) controlsContainer.classList.remove('visible'); });
-
     playerContainer.addEventListener('wheel', e => {
         e.preventDefault();
         video.muted = false;
@@ -705,7 +842,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     document.addEventListener('keyup', e => pressedKeys.delete(e.key.toLowerCase()));
-
     document.addEventListener('keydown', e => {
         if (['INPUT', 'SELECT'].includes(e.target.tagName)) return;
         const key = e.key.toLowerCase();
@@ -768,23 +904,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     const minPlaylistWidth = 200, maxPlaylistWidth = 800;
-    const startResize = e => {
-        e.preventDefault();
-        document.body.style.cursor = 'col-resize';
-        playerContainer.style.pointerEvents = 'none';
-        document.addEventListener('mousemove', doResize);
-        document.addEventListener('mouseup', stopResize);
-    };
-    const doResize = e => {
-        let newWidth = e.clientX;
-        if (newWidth > minPlaylistWidth && newWidth < maxPlaylistWidth) document.documentElement.style.setProperty('--playlist-width', `${newWidth}px`);
-    };
-    const stopResize = () => {
-        document.body.style.cursor = 'default';
-        playerContainer.style.pointerEvents = 'auto';
-        document.removeEventListener('mousemove', doResize);
-        document.removeEventListener('mouseup', stopResize);
-    };
+    const startResize = e => { e.preventDefault(); document.body.style.cursor = 'col-resize'; playerContainer.style.pointerEvents = 'none'; document.addEventListener('mousemove', doResize); document.addEventListener('mouseup', stopResize); };
+    const doResize = e => { let newWidth = e.clientX; if (newWidth > minPlaylistWidth && newWidth < maxPlaylistWidth) document.documentElement.style.setProperty('--playlist-width', `${newWidth}px`); };
+    const stopResize = () => { document.body.style.cursor = 'default'; playerContainer.style.pointerEvents = 'auto'; document.removeEventListener('mousemove', doResize); document.removeEventListener('mouseup', stopResize); };
     playlistResizer.addEventListener('mousedown', startResize);
 
     const updateSubtitleSelectors = () => {
@@ -852,6 +974,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         saveSettings();
     });
+
+    // NEW: Handlers for adding subtitle files via button
+    addSubtitleBtn.addEventListener('click', () => subtitleFileInput.click());
+    subtitleFileInput.addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+
+        // Filter out files that are already loaded
+        const newFiles = files.filter(file => !loadedSubtitles.some(sub => sub.name === file.name));
+        if (newFiles.length === 0) {
+            e.target.value = null; // Clear input
+            return;
+        }
+
+        const newSubtitles = await Promise.all(newFiles.map(file => new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = event => {
+                let vttContent = file.name.endsWith('.srt') ? srtToVtt(event.target.result) : file.name.endsWith('.ass') ? assToVtt(event.target.result) : event.target.result;
+                resolve({ name: file.name, vtt: vttContent, cues: parseVttCues(vttContent) });
+            };
+            reader.readAsText(file);
+        })));
+
+        loadedSubtitles.push(...newSubtitles);
+        updateSubtitleSelectors();
+        e.target.value = null; // Clear input for next selection
+    });
     
     document.addEventListener('click', e => {
         if (settingsPanel.style.display === 'block' && !settingsPanel.contains(e.target) && !settingsBtn.contains(e.target)) {
@@ -867,12 +1016,11 @@ document.addEventListener('DOMContentLoaded', () => {
         fullscreenBtn.innerHTML = fullscreenEnterIcon;
         volumeFilled.style.width = `${video.volume * 100}%`;
         updateNavButtons();
-        loadSettings(); // Load saved settings on startup
+        loadSettings();
     };
     init();
 });
 </script>
 
 </body>
-
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML5 Offline Player with Playlist (Optimized & Resizable)</title>
+    <title>HTML5 Offline Player (Glassmorphism + Neumorphism)</title>
     <style>
         :root {
             --primary-bg-color: rgba(20, 20, 20, 0.7);
@@ -14,15 +14,25 @@
             --transparent-black-bg: rgba(0, 0, 0, 0.7);
             --transparent-white-bg: rgba(255, 255, 255, 0.7);
             --glass-border-color: rgba(255, 255, 255, 0.2);
-            --glass-bg-color: rgba(255, 255, 255, 0.15);
+            --glass-bg-color: rgba(45, 45, 45, 0.4);
             --glass-dark-bg-color: rgba(30, 30, 30, 0.6);
             --interactive-bg-color: rgba(0, 0, 0, 0.3);
             --dropdown-option-bg: #2a2a2a;
             --playlist-item-hover-bg: rgba(255, 255, 255, 0.1);
             --playlist-item-active-bg: rgba(0, 170, 255, 0.3);
             --playlist-width: 300px;
-            --body-bg-color: #1a1a1a;
+            --body-bg-color: #2a2a2e;
             --progress-filled-color: #ffffff;
+            
+            /* Neumorphism Shadows for Dark Theme */
+            --neumorphic-shadow-light: rgba(255, 255, 255, 0.1);
+            --neumorphic-shadow-dark: rgba(0, 0, 0, 0.5);
+            --neumorphic-shadow: 6px 6px 14px var(--neumorphic-shadow-dark), -6px -6px 14px var(--neumorphic-shadow-light);
+            --neumorphic-shadow-inset: inset 4px 4px 8px var(--neumorphic-shadow-dark), inset -4px -4px 8px var(--neumorphic-shadow-light);
+
+            /* -- NEW: Variables for dynamic scaling -- */
+            --controls-scale: 0.96;
+            --settings-scale: 0.97;
         }
 
         body.light-theme {
@@ -33,13 +43,19 @@
             --slider-track-highlight-color: #aaa;
             --glass-border-color: rgba(0, 0, 0, 0.1);
             --glass-bg-color: rgba(255, 255, 255, 0.6);
-            --glass-dark-bg-color: rgba(245, 245, 245, 0.8);
+            --glass-dark-bg-color: rgba(235, 235, 235, 0.75);
             --interactive-bg-color: rgba(0, 0, 0, 0.1);
             --dropdown-option-bg: #f0f0f0;
             --playlist-item-hover-bg: rgba(0, 0, 0, 0.05);
             --playlist-item-active-bg: rgba(0, 119, 204, 0.2);
-            --body-bg-color: #f0f0f0;
+            --body-bg-color: #e0e5ec;
             --progress-filled-color: #333;
+
+            /* Neumorphism Shadows for Light Theme */
+            --neumorphic-shadow-light: #ffffff;
+            --neumorphic-shadow-dark: rgba(55, 84, 170, 0.15);
+            --neumorphic-shadow: 7px 7px 15px var(--neumorphic-shadow-dark), -7px -7px 15px var(--neumorphic-shadow-light);
+            --neumorphic-shadow-inset: inset 5px 5px 10px var(--neumorphic-shadow-dark), inset -5px -5px 10px var(--neumorphic-shadow-light);
         }
 
 
@@ -95,7 +111,64 @@
 
         #primary-subtitle-display { bottom: 60px; font-size: 26px; }
         #secondary-subtitle-display { top: 20px; font-size: 21px; direction: ltr; }
-
+        
+        #resume-playback-toast {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--glass-dark-bg-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border-color);
+            border-radius: 16px;
+            padding: 12px 20px;
+            z-index: 12;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            box-shadow: var(--neumorphic-shadow);
+            opacity: 0;
+            transition: opacity 0.3s ease, bottom 0.3s ease;
+        }
+        #resume-playback-toast.visible {
+            display: flex;
+            opacity: 1;
+        }
+        #resume-playback-toast p {
+            margin: 0;
+            font-size: 14px;
+        }
+        #resume-playback-toast button {
+            background-color: var(--interactive-bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--glass-border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 2px 2px 5px var(--neumorphic-shadow-dark), -2px -2px 5px var(--neumorphic-shadow-light);
+        }
+        #resume-playback-toast button:active:not(#close-resume-toast-btn) {
+            box-shadow: var(--neumorphic-shadow-inset);
+        }
+        #close-resume-toast-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 24px;
+            line-height: 1;
+            padding: 5px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+            box-shadow: none;
+        }
+        #close-resume-toast-btn:hover {
+            opacity: 1;
+        }
+        
         #drop-zone {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.6); border: 3px dashed var(--accent-color);
@@ -106,7 +179,6 @@
         #drop-zone.hidden { display: none; }
         #drop-zone.dragover { background-color: rgba(0, 170, 255, 0.3); border-color: #fff; }
 
-        /* New styles for the online link box */
         #online-link-container {
             position: absolute;
             top: 40px;
@@ -123,7 +195,7 @@
             gap: 10px;
             width: 50%;
             max-width: 600px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: var(--neumorphic-shadow);
         }
 
         #online-link-container.hidden {
@@ -132,15 +204,16 @@
 
         #online-link-input {
             flex-grow: 1;
-            background-color: var(--interactive-bg-color);
+            background-color: transparent;
             color: var(--text-color);
-            border: 1px solid var(--glass-border-color);
+            border: none;
             border-radius: 8px;
             padding: 10px 15px;
             font-family: inherit;
             font-size: 14px;
             direction: ltr;
             text-align: left;
+            box-shadow: var(--neumorphic-shadow-inset);
         }
 
         #online-link-input::placeholder {
@@ -158,11 +231,16 @@
             font-family: inherit;
             font-size: 14px;
             cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.2s ease;
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 2px 2px 5px var(--neumorphic-shadow-dark), -2px -2px 5px var(--neumorphic-shadow-light);
         }
 
         #play-online-link-btn:hover {
             transform: scale(1.05);
+        }
+        #play-online-link-btn:active {
+            box-shadow: var(--neumorphic-shadow-inset);
+            transform: scale(1);
         }
 
 
@@ -174,9 +252,10 @@
 
         .controls {
             position: absolute;
-            bottom: 5px;
+            bottom: 3.7px; /* Adjusted for scaling */
             left: 50%;
-            transform: translateX(-50%);
+            /* -- MODIFIED: Using variable for scaling -- */
+            transform: translateX(-50%) scale(var(--controls-scale));
             width: calc(100% - 40px);
             max-width: 1200px;
             padding: 4px 15px;
@@ -185,12 +264,14 @@
             background-color: var(--glass-bg-color);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border-radius: 12px;
+            border-radius: 16px;
             border: 1px solid var(--glass-border-color);
+            box-shadow: var(--neumorphic-shadow);
+            transform-origin: bottom center; /* Added for better scaling anchor */
         }
 
-        .progress-bar { flex-grow: 1; height: 5px; background-color: var(--slider-track-color); border-radius: 3px; margin: 0 15px; cursor: pointer; direction: ltr; position: relative; box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5); }
-        .progress-filled { height: 100%; background-color: var(--progress-filled-color); border-radius: 3px; width: 0%; pointer-events: none; position: relative; box-shadow: 0 0 4px rgba(0, 0, 0, 0.6); }
+        .progress-bar { flex-grow: 1; height: 5px; background-color: var(--slider-track-color); border-radius: 3px; margin: 0 15px; cursor: pointer; direction: ltr; position: relative; box-shadow: var(--neumorphic-shadow-inset); }
+        .progress-filled { height: 100%; background-color: var(--progress-filled-color); border-radius: 3px; width: 0%; pointer-events: none; position: relative; }
         .progress-filled::after { content: ''; position: absolute; right: 0; top: 50%; transform: translate(50%, -50%); width: 16px; height: 16px; background: var(--progress-filled-color); border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.2s ease; }
         .progress-bar:hover .progress-filled::after { opacity: 1; }
 
@@ -198,37 +279,69 @@
         .left-controls, .right-controls { display: flex; align-items: center; gap: 15px; }
         #speed-display { font-size: 14px; text-shadow: 0 1px 2px rgba(0,0,0,0.7); min-width: 40px; text-align: center; }
 
-        .control-button { background: none; border: none; color: var(--text-color); font-size: 24px; cursor: pointer; padding: 5px; display: flex; align-items: center; transition: transform 0.2s ease, opacity 0.2s ease; }
-        .control-button:hover { transform: scale(1.1); }
-        .control-button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .control-button { 
+            background: none; 
+            border: none; 
+            color: var(--text-color); 
+            font-size: 24px; 
+            cursor: pointer; 
+            padding: 8px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            border-radius: 50%;
+            transition: transform 0.2s ease, box-shadow 0.2s ease; 
+            box-shadow: 3px 3px 6px var(--neumorphic-shadow-dark), -3px -3px 6px var(--neumorphic-shadow-light);
+        }
+        .control-button:hover { 
+            /* -- MODIFIED: Changed hover effect to scale -- */
+            transform: scale(1.15); 
+        }
+        .control-button:active {
+            /* -- MODIFIED: Adjusted active effect for scaling -- */
+            box-shadow: var(--neumorphic-shadow-inset);
+            transform: scale(1.05);
+        }
+        .control-button:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+            transform: none; 
+            box-shadow: none;
+        }
 
         #time-display { cursor: pointer; user-select: none; direction: ltr; font-size: 14px; text-shadow: 0 1px 2px rgba(0,0,0,0.7); min-width: 90px; text-align: center; }
         .control-button svg { width: 24px; height: 24px; fill: var(--text-color); filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
         #fullscreen-btn svg path { fill: none; stroke: var(--text-color); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        #play-pause-btn { 
+            width: 48px; height: 48px;
+        }
         #play-pause-btn svg { width: 30px; height: 30px; }
 
         .volume-container { display: flex; align-items: center; direction: ltr; }
         .volume-container .control-button svg { width: 22px; height: 22px; }
-        #volume-slider-container { width: 80px; height: 5px; background-color: var(--slider-track-color); border-radius: 3px; cursor: pointer; position: relative; box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5); }
+        #volume-slider-container { width: 80px; height: 5px; background-color: var(--slider-track-color); border-radius: 3px; cursor: pointer; position: relative; box-shadow: var(--neumorphic-shadow-inset); }
         #volume-filled { height: 100%; background-color: var(--progress-filled-color); border-radius: 3px; width: 100%; pointer-events: none; position: relative; }
         #volume-filled::after { content: ''; position: absolute; right: 0; top: 50%; transform: translate(50%, -50%); width: 14px; height: 14px; background: var(--progress-filled-color); border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.2s ease; }
         .volume-container:hover #volume-filled::after { opacity: 1; }
 
-        /* UPDATED: Settings Panel smaller and lower */
         #settings-panel {
             position: absolute;
-            bottom: 70px; /* Lowered */
+            bottom: 70px; 
             right: 20px;
             background-color: var(--glass-dark-bg-color);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            border-radius: 10px; /* Slightly smaller radius */
-            padding: 15px; /* Reduced padding */
+            border-radius: 12px;
+            padding: 15px;
             z-index: 6;
             display: none;
-            width: 315px; /* Reduced width */
+            width: 315px;
             border: 1px solid var(--glass-border-color);
-            font-size: 0.9em; /* Reduced base font size */
+            font-size: 0.9em;
+            box-shadow: var(--neumorphic-shadow);
+            /* -- MODIFIED: Using variable for scaling -- */
+            transform-origin: bottom right; /* Anchor scaling to the corner */
+            transform: scale(var(--settings-scale));
         }
 
         #playlist-panel {
@@ -248,11 +361,12 @@
             direction: rtl;
             box-sizing: border-box;
             border-right: 1px solid var(--glass-border-color);
+            box-shadow: var(--neumorphic-shadow);
         }
         #playlist-panel.visible { transform: translateX(0); }
         .playlist-item {
             padding: 10px; margin-bottom: 5px; border-radius: 8px;
-            cursor: pointer; transition: background-color 0.2s ease;
+            cursor: pointer; transition: background-color 0.2s ease, box-shadow 0.2s ease;
             font-size: 14px; color: var(--text-color);
             border: 1px solid transparent;
             text-align: right;
@@ -260,7 +374,12 @@
             word-wrap: break-word;
         }
         .playlist-item:hover { background-color: var(--playlist-item-hover-bg); }
-        .playlist-item.active { background-color: var(--playlist-item-active-bg); border-color: var(--accent-color); font-weight: bold; }
+        .playlist-item.active { 
+            background-color: var(--playlist-item-active-bg); 
+            border-color: var(--accent-color); 
+            font-weight: bold;
+            box-shadow: var(--neumorphic-shadow-inset);
+        }
         
         #playlist-resizer {
             position: fixed;
@@ -280,12 +399,11 @@
             margin-left: var(--playlist-width);
         }
 
-        /* UPDATED: Smaller slider thumbs */
         input[type="range"].subtitle-slider { -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; width: 100%; }
-        input[type="range"].subtitle-slider::-webkit-slider-runnable-track { background: var(--slider-track-highlight-color); height: 4px; border-radius: 4px; }
-        input[type="range"].subtitle-slider::-moz-range-track { background: var(--slider-track-highlight-color); height: 4px; border-radius: 4px; }
-        input[type="range"].subtitle-slider::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -5px; background-color: var(--progress-filled-color); height: 14px; width: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); }
-        input[type="range"].subtitle-slider::-moz-range-thumb { border: none; background-color: var(--progress-filled-color); height: 14px; width: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); }
+        input[type="range"].subtitle-slider::-webkit-slider-runnable-track { background: var(--slider-track-highlight-color); height: 4px; border-radius: 4px; box-shadow: var(--neumorphic-shadow-inset); }
+        input[type="range"].subtitle-slider::-moz-range-track { background: var(--slider-track-highlight-color); height: 4px; border-radius: 4px; box-shadow: var(--neumorphic-shadow-inset); }
+        input[type="range"].subtitle-slider::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -5px; background-color: var(--progress-filled-color); height: 14px; width: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); box-shadow: 2px 2px 4px var(--neumorphic-shadow-dark), -2px -2px 4px var(--neumorphic-shadow-light); }
+        input[type="range"].subtitle-slider::-moz-range-thumb { border: none; background-color: var(--progress-filled-color); height: 14px; width: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); box-shadow: 2px 2px 4px var(--neumorphic-shadow-dark), -2px -2px 4px var(--neumorphic-shadow-light); }
 
         .settings-section { margin-bottom: 15px; border-bottom: 1px solid var(--glass-border-color); padding-bottom: 12px; }
         .settings-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
@@ -293,29 +411,36 @@
         .settings-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
         .settings-row label { flex-basis: 40%; }
         .settings-row select, .settings-row .options-container, .settings-row input[type="range"], #add-subtitle-btn { flex-basis: 60%; }
-        .settings-row select { background-color: var(--glass-bg-color); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); color: var(--text-color); border: 1px solid var(--glass-border-color); border-radius: 6px; padding: 4px; width: 100%; overflow: hidden; text-overflow: ellipsis; }
+        .settings-row select { background-color: var(--glass-bg-color); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); color: var(--text-color); border: 1px solid var(--glass-border-color); border-radius: 6px; padding: 4px; width: 100%; overflow: hidden; text-overflow: ellipsis; box-shadow: var(--neumorphic-shadow-inset); }
         .settings-row select option { background-color: var(--dropdown-option-bg); color: var(--text-color); }
         
-        /* UPDATED: Smaller color buttons */
-        .color-options button { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--text-color); cursor: pointer; margin: 0 2px; transition: transform 0.2s ease; }
+        .color-options button { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--text-color); cursor: pointer; margin: 0 2px; transition: transform 0.2s ease, box-shadow 0.2s ease; box-shadow: 2px 2px 4px var(--neumorphic-shadow-dark), -2px -2px 4px var(--neumorphic-shadow-light); }
         .color-options button:hover { transform: scale(1.15); }
+        .color-options button:active { box-shadow: var(--neumorphic-shadow-inset); }
 
         .direction-buttons button, #add-subtitle-btn {
             background-color: var(--interactive-bg-color);
             color: var(--text-color);
             border: 1px solid var(--glass-border-color);
             border-radius: 5px;
-            padding: 4px 8px; /* Reduced padding */
+            padding: 4px 8px;
             cursor: pointer;
-            font-size: 12px; /* Reduced font size */
-            transition: background-color 0.2s ease;
+            font-size: 12px;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 2px 2px 4px var(--neumorphic-shadow-dark), -2px -2px 4px var(--neumorphic-shadow-light);
         }
         .direction-buttons button:hover:not(.active), #add-subtitle-btn:hover { background-color: rgba(255, 255, 255, 0.2); }
-        .direction-buttons button.active { background-color: var(--accent-color); border-color: var(--accent-color); color: #fff; }
+        .direction-buttons button.active { 
+            background-color: var(--accent-color); 
+            border-color: var(--accent-color); 
+            color: #fff; 
+            box-shadow: var(--neumorphic-shadow-inset);
+        }
     </style>
 </head>
 <body>
 
+<!-- HTML body remains the same as your original code -->
 <div id="playlist-panel"></div>
 <div id="playlist-resizer"></div>
 <input type="file" id="subtitle-file-input" hidden multiple accept=".srt,.vtt,.ass">
@@ -329,6 +454,11 @@
     <div id="drop-zone"><p>فایل‌های ویدیو و زیرنویس را اینجا بکشید و رها کنید</p></div>
     <div class="subtitle-display" id="primary-subtitle-display"></div>
     <div class="subtitle-display" id="secondary-subtitle-display"></div>
+    <div id="resume-playback-toast">
+        <p>ادامه از آخرین زمان پخش...</p>
+        <button id="start-over-btn">شروع از اول</button>
+        <button id="close-resume-toast-btn">&times;</button>
+    </div>
     <div class="controls-container" id="controls-container">
         <div class="controls">
             <div class="bottom-controls">
@@ -379,7 +509,6 @@
                 <button data-value="light">روشن</button>
             </div>
         </div>
-        <!-- NEW: Add Subtitle Button -->
         <div class="settings-row">
             <label>افزودن زیرنویس:</label>
             <button id="add-subtitle-btn">انتخاب فایل</button>
@@ -467,6 +596,7 @@
 </div>
 
 <script>
+// JavaScript remains the same as your original code
 document.addEventListener('DOMContentLoaded', () => {
     const getElem = id => document.getElementById(id);
     const playerContainer = getElem('player-container');
@@ -502,11 +632,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const onlineLinkContainer = getElem('online-link-container');
     const onlineLinkInput = getElem('online-link-input');
     const playOnlineLinkBtn = getElem('play-online-link-btn');
-    // New Elements for adding subtitles
     const addSubtitleBtn = getElem('add-subtitle-btn');
     const subtitleFileInput = getElem('subtitle-file-input');
+    const resumeToast = getElem('resume-playback-toast');
+    const startOverBtn = getElem('start-over-btn');
+    const closeResumeToastBtn = getElem('close-resume-toast-btn');
 
     let loadedVideos = [], loadedSubtitles = [], currentVideoIndex = -1, activePrimaryCues = [], activeSecondaryCues = [], previousPlaybackRate = 1.0, isSecondarySubEnabled = false, controlsTimeout, displayRemainingTime = false, isSeeking = false, isVolumeSeeking = false;
+    let timeUpdateInterval;
     const persianSubKeywords = ['persian', 'per', 'fa', 'farsi', 'فارسی'];
     const englishSubKeywords = ['english', 'en', 'انگلیسی'];
     let primarySubPosition = { x: 0, y: 0 }, secondarySubPosition = { x: 0, y: 0 };
@@ -549,12 +682,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const saveSettings = () => {
+        const root = document.documentElement;
         const settings = {
             theme: document.body.classList.contains('light-theme') ? 'light' : 'dark',
             volume: video.volume,
             muted: video.muted,
             playbackRate: video.playbackRate,
             displayRemainingTime,
+            controlsScale: getComputedStyle(root).getPropertyValue('--controls-scale').trim(),
+            settingsScale: getComputedStyle(root).getPropertyValue('--settings-scale').trim(),
             primary: {
                 fontSize: primarySubDisplay.style.fontSize,
                 direction: primarySubDisplay.style.direction,
@@ -575,6 +711,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadSettings = () => {
         const settings = JSON.parse(localStorage.getItem('videoPlayerSettings'));
         if (!settings) return;
+
+        const root = document.documentElement;
+        root.style.setProperty('--controls-scale', settings.controlsScale || '0.96');
+        root.style.setProperty('--settings-scale', settings.settingsScale || '0.97');
 
         document.body.classList.toggle('light-theme', settings.theme === 'light');
         themeSelector.querySelector(`button[data-value="dark"]`).classList.toggle('active', settings.theme !== 'light');
@@ -611,6 +751,48 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     };
+
+    const savePlaybackPosition = () => {
+        if (!video.src || currentVideoIndex < 0 || !loadedVideos[currentVideoIndex]) return;
+        const videoName = loadedVideos[currentVideoIndex].name;
+        if (video.currentTime > video.duration - 5) {
+             localStorage.removeItem(videoName);
+        } else {
+             localStorage.setItem(videoName, video.currentTime);
+        }
+    };
+
+    const checkForSavedPosition = () => {
+        if (currentVideoIndex < 0 || !loadedVideos[currentVideoIndex]) return;
+        const videoName = loadedVideos[currentVideoIndex].name;
+        const savedTime = parseFloat(localStorage.getItem(videoName));
+
+        if (savedTime && savedTime > 5) {
+            video.addEventListener('seeked', () => {
+                updateSubtitles(video.currentTime);
+            }, { once: true });
+            
+            video.currentTime = savedTime;
+
+            const hideToast = () => {
+                resumeToast.classList.remove('visible');
+                startOverBtn.removeEventListener('click', startOverHandler);
+                closeResumeToastBtn.removeEventListener('click', hideToast);
+            };
+
+            const startOverHandler = () => {
+                localStorage.removeItem(videoName);
+                video.currentTime = 0;
+                hideToast();
+            };
+
+            startOverBtn.addEventListener('click', startOverHandler);
+            closeResumeToastBtn.addEventListener('click', hideToast);
+            
+            resumeToast.classList.add('visible');
+            setTimeout(hideToast, 8000);
+        }
+    };
     
     const updateSubtitles = currentTime => {
         const findCue = cues => cues.find(cue => currentTime >= cue.start && currentTime <= cue.end);
@@ -629,7 +811,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(controlsTimeout);
         controlsTimeout = setTimeout(() => {
             const isFocusedOnSettings = settingsPanel.contains(document.activeElement) || document.activeElement === settingsBtn;
-            const isHovering = controlsContainer.matches(':hover') || settingsPanel.matches(':hover');
+            const isHovering = controlsContainer.matches(':hover') || settingsPanel.matches(':hover') || resumeToast.matches(':hover');
             if (!video.paused && !isSeeking && !isVolumeSeeking && !isHovering && !isFocusedOnSettings) {
                 controlsContainer.classList.remove('visible');
                 playerContainer.style.cursor = 'none';
@@ -676,13 +858,12 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePlaylistHighlight();
         updateNavButtons();
         autoSelectSubtitlesForCurrentVideo();
+        video.addEventListener('loadedmetadata', checkForSavedPosition, { once: true });
     };
 
-    // UPDATED: Logic split for single video vs playlist
     const autoSelectSubtitlesForCurrentVideo = () => {
         if (currentVideoIndex < 0 || loadedSubtitles.length === 0) return;
 
-        // Logic for a single video file
         if (loadedVideos.length === 1) {
             const findSubIndexByKeywords = (keywords) => loadedSubtitles.findIndex(sub => keywords.some(kw => sub.name.toLowerCase().includes(kw)));
             
@@ -696,11 +877,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (englishIndex > -1) {
                 secondarySubToggle.checked = true;
-                secondarySubToggle.dispatchEvent(new Event('change')); // Trigger visibility
+                secondarySubToggle.dispatchEvent(new Event('change'));
                 secondarySubSelect.value = englishIndex;
                 secondarySubSelect.dispatchEvent(new Event('change'));
             }
-        // Logic for a playlist
         } else {
             const videoBaseName = loadedVideos[currentVideoIndex].name.substring(0, loadedVideos[currentVideoIndex].name.lastIndexOf('.'));
             const findSubIndex = isPersian => loadedSubtitles.findIndex(sub => persianSubKeywords.some(kw => sub.name.toLowerCase().includes(kw)) === isPersian && sub.name.toLowerCase().startsWith(videoBaseName.toLowerCase()));
@@ -765,9 +945,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    video.addEventListener('play', () => { playPauseBtn.innerHTML = pauseIconSVG; startControlsHideTimer(); });
-    video.addEventListener('pause', () => { playPauseBtn.innerHTML = playIconSVG; controlsContainer.classList.add('visible'); playerContainer.style.cursor = 'default'; clearTimeout(controlsTimeout); });
-    video.addEventListener('ended', () => { if (!nextBtn.disabled) nextBtn.click(); });
+    video.addEventListener('play', () => { 
+        playPauseBtn.innerHTML = pauseIconSVG; 
+        startControlsHideTimer(); 
+        clearInterval(timeUpdateInterval);
+        timeUpdateInterval = setInterval(savePlaybackPosition, 1000);
+    });
+    video.addEventListener('pause', () => { 
+        playPauseBtn.innerHTML = playIconSVG; 
+        controlsContainer.classList.add('visible'); 
+        playerContainer.style.cursor = 'default'; 
+        clearTimeout(controlsTimeout);
+        savePlaybackPosition();
+        clearInterval(timeUpdateInterval);
+    });
+    video.addEventListener('ended', () => {
+        if (currentVideoIndex >= 0 && loadedVideos[currentVideoIndex]) {
+             localStorage.removeItem(loadedVideos[currentVideoIndex].name);
+        }
+        if (!nextBtn.disabled) nextBtn.click();
+    });
     video.addEventListener('timeupdate', () => {
         if (!isSeeking && video.duration) progressFilled.style.width = `${(video.currentTime / video.duration) * 100}%`;
         updateTimeDisplay();
@@ -813,7 +1010,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    addScrubListener(progressBar, p => { if(video.duration) { progressFilled.style.width = `${p * 100}%`; video.currentTime = p * video.duration; } }, () => isSeeking = true, () => isSeeking = false);
+    addScrubListener(progressBar, p => { if(video.duration) { progressFilled.style.width = `${p * 100}%`; video.currentTime = p * video.duration; } }, () => isSeeking = true, () => { isSeeking = false; savePlaybackPosition(); });
     addScrubListener(volumeSliderContainer, p => { video.muted = false; video.volume = p; }, () => isVolumeSeeking = true, () => { isVolumeSeeking = false; saveSettings(); });
 
     timeDisplay.addEventListener('click', () => { displayRemainingTime = !displayRemainingTime; updateTimeDisplay(); saveSettings(); });
@@ -841,16 +1038,37 @@ document.addEventListener('DOMContentLoaded', () => {
         slider.dispatchEvent(new Event('input', { bubbles: true }));
     };
 
+    const handlePanelScale = (e, keyPlus, keyMinus, cssVar) => {
+        if (e.key === keyPlus || e.key === keyMinus) {
+            e.preventDefault();
+            const root = document.documentElement;
+            const currentScale = parseFloat(getComputedStyle(root).getPropertyValue(cssVar));
+            const step = 0.02;
+            let newScale = e.key === keyPlus ? currentScale + step : currentScale - step;
+            newScale = Math.max(0.7, Math.min(1.4, newScale)); // Clamp scale between 70% and 140%
+            root.style.setProperty(cssVar, newScale.toFixed(2));
+            saveSettings();
+        }
+    };
+
     document.addEventListener('keyup', e => pressedKeys.delete(e.key.toLowerCase()));
     document.addEventListener('keydown', e => {
         if (['INPUT', 'SELECT'].includes(e.target.tagName)) return;
         const key = e.key.toLowerCase();
         pressedKeys.add(key);
 
-        const resetCombination1 = pressedKeys.has('[') && pressedKeys.has(']');
-        const resetCombination2 = pressedKeys.has('ج') && pressedKeys.has('چ');
-        
-        if (resetCombination1 || resetCombination2) {
+        // Shortcuts for dynamic panel scaling
+        if (e.ctrlKey && e.altKey) {
+            handlePanelScale(e, '+', '-', '--controls-scale');
+            return;
+        }
+        if (e.ctrlKey && e.shiftKey && (key === '+' || e.key === '-')) {
+            handlePanelScale(e, '+', '-', '--settings-scale');
+            return;
+        }
+
+        const resetSubtitleCombination = (pressedKeys.has('[') && pressedKeys.has(']')) || (pressedKeys.has('ج') && pressedKeys.has('چ'));
+        if (resetSubtitleCombination) {
             e.preventDefault();
             primarySubPosition = { x: 0, y: 0 };
             primarySubDisplay.style.transform = `translateX(calc(-50% + 0px)) translateY(0px)`;
@@ -864,10 +1082,26 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // MODIFIED: Shortcut to reset panel sizes using a key combination
+        const resetPanelsCombination = (pressedKeys.has(',') && pressedKeys.has('.')) || (pressedKeys.has('و') && pressedKeys.has('.'));
+        if (resetPanelsCombination) {
+            e.preventDefault();
+            const root = document.documentElement;
+            root.style.setProperty('--controls-scale', '0.96');
+            root.style.setProperty('--settings-scale', '0.97');
+            saveSettings();
+            return;
+        }
+
+
+        // Subtitle positioning logic
         if (e.ctrlKey) {
             if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
                 e.preventDefault();
-                const isShift = e.shiftKey, positionTarget = isShift ? secondarySubPosition : primarySubPosition, elementTarget = isShift ? secondarySubDisplay : primarySubDisplay, step = 2;
+                const isShift = e.shiftKey;
+                const positionTarget = isShift ? secondarySubPosition : primarySubPosition;
+                const elementTarget = isShift ? secondarySubDisplay : primarySubDisplay;
+                const step = 2;
                 switch (key) {
                     case 'arrowup': positionTarget.y -= step; break;
                     case 'arrowdown': positionTarget.y += step; break;
@@ -880,7 +1114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const prevent = [' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', '-', '='];
-        if(prevent.includes(key)) e.preventDefault();
+        if(prevent.includes(key) || key === '+') e.preventDefault();
         
         switch (key) {
             case ' ': video.paused ? video.play() : video.pause(); break;
@@ -975,16 +1209,14 @@ document.addEventListener('DOMContentLoaded', () => {
         saveSettings();
     });
 
-    // NEW: Handlers for adding subtitle files via button
     addSubtitleBtn.addEventListener('click', () => subtitleFileInput.click());
     subtitleFileInput.addEventListener('change', async (e) => {
         const files = Array.from(e.target.files);
         if (files.length === 0) return;
 
-        // Filter out files that are already loaded
         const newFiles = files.filter(file => !loadedSubtitles.some(sub => sub.name === file.name));
         if (newFiles.length === 0) {
-            e.target.value = null; // Clear input
+            e.target.value = null;
             return;
         }
 
@@ -999,7 +1231,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         loadedSubtitles.push(...newSubtitles);
         updateSubtitleSelectors();
-        e.target.value = null; // Clear input for next selection
+        e.target.value = null;
     });
     
     document.addEventListener('click', e => {
@@ -1008,7 +1240,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    window.addEventListener('beforeunload', () => { if (video.src && video.src.startsWith('blob:')) URL.revokeObjectURL(video.src); });
+    window.addEventListener('beforeunload', () => { 
+        savePlaybackPosition();
+        if (video.src && video.src.startsWith('blob:')) URL.revokeObjectURL(video.src); 
+    });
 
     const init = () => {
         playPauseBtn.innerHTML = playIconSVG;

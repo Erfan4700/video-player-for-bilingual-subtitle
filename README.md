@@ -1,4 +1,6 @@
 https://erfan4700.github.io/video-player-for-bilingual-subtitle/
+
+
 سرعت:
 C: افزایش سرعت ←    +0.1.
 X: کاهش سرعت ← 0.1- .

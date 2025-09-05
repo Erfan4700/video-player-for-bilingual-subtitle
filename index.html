@@ -83,6 +83,10 @@
         }
 
         video { width: 100%; height: 100%; outline: none; }
+        video.inverted {
+            filter: invert(1);
+            transition: filter 0.3s ease;
+        }
 
         .subtitle-display {
             position: absolute;
@@ -510,6 +514,13 @@
             </div>
         </div>
         <div class="settings-row">
+            <label>وارونگی رنگ ویدیو:</label>
+            <div class="options-container direction-buttons" id="invert-colors-selector">
+                <button data-value="off" class="active">عادی</button>
+                <button data-value="on">وارونه</button>
+            </div>
+        </div>
+        <div class="settings-row">
             <label>افزودن زیرنویس:</label>
             <button id="add-subtitle-btn">انتخاب فایل</button>
         </div>
@@ -637,6 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resumeToast = getElem('resume-playback-toast');
     const startOverBtn = getElem('start-over-btn');
     const closeResumeToastBtn = getElem('close-resume-toast-btn');
+    const invertColorsSelector = getElem('invert-colors-selector');
 
     let loadedVideos = [], loadedSubtitles = [], currentVideoIndex = -1, activePrimaryCues = [], activeSecondaryCues = [], previousPlaybackRate = 1.0, isSecondarySubEnabled = false, controlsTimeout, displayRemainingTime = false, isSeeking = false, isVolumeSeeking = false;
     let timeUpdateInterval;
@@ -685,6 +697,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const root = document.documentElement;
         const settings = {
             theme: document.body.classList.contains('light-theme') ? 'light' : 'dark',
+            videoInverted: video.classList.contains('inverted'),
             volume: video.volume,
             muted: video.muted,
             playbackRate: video.playbackRate,
@@ -719,6 +732,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.toggle('light-theme', settings.theme === 'light');
         themeSelector.querySelector(`button[data-value="dark"]`).classList.toggle('active', settings.theme !== 'light');
         themeSelector.querySelector(`button[data-value="light"]`).classList.toggle('active', settings.theme === 'light');
+        
+        video.classList.toggle('inverted', settings.videoInverted);
+        if (settings.videoInverted) {
+            invertColorsSelector.querySelector(`button[data-value="off"]`).classList.remove('active');
+            invertColorsSelector.querySelector(`button[data-value="on"]`).classList.add('active');
+        }
 
         video.volume = settings.volume || 1;
         video.muted = settings.muted || false;
@@ -1124,7 +1143,10 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'arrowdown': video.volume = Math.max(0, video.volume - 0.1); break;
             case 'n': if(!nextBtn.disabled) nextBtn.click(); break;
             case 'b': if(!prevBtn.disabled) prevBtn.click(); break;
-            case 'f': fullscreenBtn.click(); break;
+            case 'f':
+            case 'ب':
+                fullscreenBtn.click();
+                break;
             case 'p': pipBtn.click(); break;
             case 'c': case 'ز': video.playbackRate = Math.min(4, video.playbackRate + 0.1); break;
             case 'x': case 'ط': video.playbackRate = Math.max(0.1, video.playbackRate - 0.1); break;
@@ -1182,6 +1204,15 @@ document.addEventListener('DOMContentLoaded', () => {
     settingsPanel.addEventListener('click', e => {
         const button = e.target.closest('button');
         if(!button) return;
+
+        if (button.parentElement.id === 'invert-colors-selector') {
+            const mode = button.dataset.value;
+            video.classList.toggle('inverted', mode === 'on');
+            invertColorsSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            saveSettings();
+            return;
+        }
 
         if (button.parentElement.id === 'theme-selector') {
             const theme = button.dataset.value;

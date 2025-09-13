@@ -607,7 +607,6 @@
 </div>
 
 <script>
-// JavaScript remains the same as your original code
 document.addEventListener('DOMContentLoaded', () => {
     const getElem = id => document.getElementById(id);
     const playerContainer = getElem('player-container');
@@ -770,21 +769,40 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     };
+    
+    // -- MODIFIED START: Unified function to get video ID (URL for online, name for offline)
+    const getCurrentVideoId = () => {
+        // Online videos are identified by their full URL
+        if (video.src && !video.src.startsWith('blob:')) {
+            return video.src;
+        }
+        // Offline videos are identified by their file name
+        if (currentVideoIndex >= 0 && loadedVideos[currentVideoIndex]) {
+            return loadedVideos[currentVideoIndex].name;
+        }
+        return null;
+    };
+    // -- MODIFIED END
 
+    // -- MODIFIED START: Uses unified ID for saving playback position
     const savePlaybackPosition = () => {
-        if (!video.src || currentVideoIndex < 0 || !loadedVideos[currentVideoIndex]) return;
-        const videoName = loadedVideos[currentVideoIndex].name;
-        if (video.currentTime > video.duration - 5) {
-             localStorage.removeItem(videoName);
+        const videoId = getCurrentVideoId();
+        if (!videoId) return;
+
+        if (video.duration && video.currentTime > video.duration - 5) {
+             localStorage.removeItem(videoId);
         } else {
-             localStorage.setItem(videoName, video.currentTime);
+             localStorage.setItem(videoId, video.currentTime);
         }
     };
+    // -- MODIFIED END
 
+    // -- MODIFIED START: Uses unified ID to check for saved position
     const checkForSavedPosition = () => {
-        if (currentVideoIndex < 0 || !loadedVideos[currentVideoIndex]) return;
-        const videoName = loadedVideos[currentVideoIndex].name;
-        const savedTime = parseFloat(localStorage.getItem(videoName));
+        const videoId = getCurrentVideoId();
+        if (!videoId) return;
+        
+        const savedTime = parseFloat(localStorage.getItem(videoId));
 
         if (savedTime && savedTime > 5) {
             video.addEventListener('seeked', () => {
@@ -800,7 +818,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             const startOverHandler = () => {
-                localStorage.removeItem(videoName);
+                localStorage.removeItem(videoId);
                 video.currentTime = 0;
                 hideToast();
             };
@@ -812,6 +830,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(hideToast, 8000);
         }
     };
+    // -- MODIFIED END
     
     const updateSubtitles = currentTime => {
         const findCue = cues => cues.find(cue => currentTime >= cue.start && currentTime <= cue.end);
@@ -877,7 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePlaylistHighlight();
         updateNavButtons();
         autoSelectSubtitlesForCurrentVideo();
-        video.addEventListener('loadedmetadata', checkForSavedPosition, { once: true });
+        // -- MODIFIED: The check for saved position is now handled by a global 'loadedmetadata' event listener
     };
 
     const autoSelectSubtitlesForCurrentVideo = () => {
@@ -979,9 +998,7 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(timeUpdateInterval);
     });
     video.addEventListener('ended', () => {
-        if (currentVideoIndex >= 0 && loadedVideos[currentVideoIndex]) {
-             localStorage.removeItem(loadedVideos[currentVideoIndex].name);
-        }
+        savePlaybackPosition(); // This will clear the saved time
         if (!nextBtn.disabled) nextBtn.click();
     });
     video.addEventListener('timeupdate', () => {
@@ -989,7 +1006,12 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTimeDisplay();
         updateSubtitles(video.currentTime);
     });
-    video.addEventListener('loadedmetadata', updateTimeDisplay);
+    // -- MODIFIED START: Centralized 'loadedmetadata' handler for both online and offline videos
+    video.addEventListener('loadedmetadata', () => {
+        updateTimeDisplay();
+        checkForSavedPosition();
+    });
+    // -- MODIFIED END
     video.addEventListener('volumechange', () => {
         const volumePercent = video.muted ? 0 : video.volume * 100;
         volumeFilled.style.width = `${volumePercent}%`;
@@ -1029,7 +1051,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    addScrubListener(progressBar, p => { if(video.duration) { progressFilled.style.width = `${p * 100}%`; video.currentTime = p * video.duration; } }, () => isSeeking = true, () => { isSeeking = false; savePlaybackPosition(); });
+    addScrubListener(progressBar, p => { if(video.duration) { progressFilled.style.width = `${p * 100}%`; video.currentTime = p * video.duration; updateSubtitles(video.currentTime); } }, () => isSeeking = true, () => { isSeeking = false; savePlaybackPosition(); });
     addScrubListener(volumeSliderContainer, p => { video.muted = false; video.volume = p; }, () => isVolumeSeeking = true, () => { isVolumeSeeking = false; saveSettings(); });
 
     timeDisplay.addEventListener('click', () => { displayRemainingTime = !displayRemainingTime; updateTimeDisplay(); saveSettings(); });

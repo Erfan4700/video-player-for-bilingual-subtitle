@@ -226,7 +226,7 @@
             text-align: right;
         }
 
-        #play-online-link-btn {
+        #play-online-link-btn, #select-files-btn, #history-btn {
             background-color: var(--accent-color);
             color: #fff;
             border: none;
@@ -238,11 +238,13 @@
             transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
             box-shadow: 2px 2px 5px var(--neumorphic-shadow-dark), -2px -2px 5px var(--neumorphic-shadow-light);
         }
+        
+        #history-btn { padding: 10px 12px; }
 
-        #play-online-link-btn:hover {
+        #play-online-link-btn:hover, #select-files-btn:hover, #history-btn:hover {
             transform: scale(1.05);
         }
-        #play-online-link-btn:active {
+        #play-online-link-btn:active, #select-files-btn:active, #history-btn:active {
             box-shadow: var(--neumorphic-shadow-inset);
             transform: scale(1);
         }
@@ -348,7 +350,7 @@
             transform: scale(var(--settings-scale));
         }
 
-        #playlist-panel {
+        #playlist-panel, #history-panel {
             position: fixed;
             top: 0;
             left: 0;
@@ -357,7 +359,7 @@
             background-color: var(--glass-dark-bg-color);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            z-index: 7;
+            z-index: 15; /* Increased z-index to be on top of other elements */
             padding: 20px;
             transform: translateX(-100%);
             transition: transform 0.3s ease-in-out;
@@ -367,7 +369,16 @@
             border-right: 1px solid var(--glass-border-color);
             box-shadow: var(--neumorphic-shadow);
         }
-        #playlist-panel.visible { transform: translateX(0); }
+        #history-panel {
+            left: auto;
+            right: 0;
+            transform: translateX(100%);
+            border-right: none;
+            border-left: 1px solid var(--glass-border-color);
+        }
+
+        #playlist-panel.visible, #history-panel.visible { transform: translateX(0); }
+
         .playlist-item {
             padding: 10px; margin-bottom: 5px; border-radius: 8px;
             cursor: pointer; transition: background-color 0.2s ease, box-shadow 0.2s ease;
@@ -402,6 +413,73 @@
             width: calc(100vw - var(--playlist-width));
             margin-left: var(--playlist-width);
         }
+        /* Style for history panel */
+        #history-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        #history-panel-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        #clear-history-btn {
+            background: none; border: none; cursor: pointer;
+            padding: 5px;
+        }
+        #clear-history-btn svg {
+            width: 22px; height: 22px; fill: var(--text-color);
+            transition: fill 0.2s ease, transform 0.2s ease;
+        }
+         #clear-history-btn:hover svg {
+            fill: #ff4d4d;
+            transform: scale(1.1);
+        }
+        .history-item {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--glass-border-color);
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.2s ease;
+        }
+        .history-item:hover {
+            background-color: var(--playlist-item-hover-bg);
+        }
+        .history-item .link {
+            direction: ltr;
+            text-align: left;
+            font-size: 12px;
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+        .history-item .name {
+            display: block;
+            text-align: right;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .delete-history-item-btn {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 20px;
+            opacity: 0.6;
+            transition: opacity 0.2s ease, color 0.2s ease;
+        }
+        .delete-history-item-btn:hover {
+            opacity: 1;
+            color: #ff4d4d;
+        }
+
 
         input[type="range"].subtitle-slider { -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; width: 100%; }
         input[type="range"].subtitle-slider::-webkit-slider-runnable-track { background: var(--slider-track-highlight-color); height: 4px; border-radius: 4px; box-shadow: var(--neumorphic-shadow-inset); }
@@ -440,18 +518,37 @@
             color: #fff; 
             box-shadow: var(--neumorphic-shadow-inset);
         }
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .volume-container {
+                display: none;
+            }
+            .controls {
+                padding: 4px 10px;
+            }
+            .left-controls, .right-controls {
+                gap: 8px;
+            }
+            #primary-subtitle-display { font-size: 20px; bottom: 75px; }
+            #secondary-subtitle-display { font-size: 16px; top: 15px; }
+        }
     </style>
 </head>
 <body>
 
-<!-- HTML body remains the same as your original code -->
 <div id="playlist-panel"></div>
+<div id="history-panel"></div>
 <div id="playlist-resizer"></div>
+<input type="file" id="local-file-input" hidden multiple accept="video/*,.srt,.vtt,.ass">
 <input type="file" id="subtitle-file-input" hidden multiple accept=".srt,.vtt,.ass">
 
 <div class="player-container" id="player-container">
     <video id="video"></video>
     <div id="online-link-container">
+        <button id="history-btn" title="تاریخچه">
+             <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+        </button>
+        <button id="select-files-btn">فایل</button>
         <input type="text" id="online-link-input" placeholder="آدرس ویدیوی آنلاین را وارد کنید">
         <button id="play-online-link-btn">پخش</button>
     </div>
@@ -635,6 +732,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const volumeFilled = getElem('volume-filled');
     const playlistBtn = getElem('playlist-btn');
     const playlistPanel = getElem('playlist-panel');
+    const historyBtn = getElem('history-btn');
+    const historyPanel = getElem('history-panel');
     const playlistResizer = getElem('playlist-resizer'); 
     const nextBtn = getElem('next-btn');
     const prevBtn = getElem('prev-btn');
@@ -644,6 +743,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const playOnlineLinkBtn = getElem('play-online-link-btn');
     const addSubtitleBtn = getElem('add-subtitle-btn');
     const subtitleFileInput = getElem('subtitle-file-input');
+    const localFileInput = getElem('local-file-input');
+    const selectFilesBtn = getElem('select-files-btn');
     const resumeToast = getElem('resume-playback-toast');
     const startOverBtn = getElem('start-over-btn');
     const closeResumeToastBtn = getElem('close-resume-toast-btn');
@@ -655,6 +756,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const englishSubKeywords = ['english', 'en', 'انگلیسی'];
     let primarySubPosition = { x: 0, y: 0 }, secondarySubPosition = { x: 0, y: 0 };
     const pressedKeys = new Set();
+    let onlineVideoHistory = JSON.parse(localStorage.getItem('onlineVideoHistory')) || [];
 
     const playIconSVG = `<svg viewBox="0 0 24 24"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>`;
     const pauseIconSVG = `<svg viewBox="0 0 24 24"><path d="M14,19H18V5H14M6,19H10V5H6V19Z"/></svg>`;
@@ -662,6 +764,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullscreenExitIcon = `<svg viewBox="0 0 24 24"><path d="M5 8V5a2 2 0 0 1 2-2h3m11 5V5a2 2 0 0 0-2-2h-3M8 19H5a2 2 0 0 1-2-2v-3m14 0v3a2 2 0 0 1-2 2h-3"/></svg>`;
     const volumeIcon = `<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>`;
     const muteIcon = `<svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>`;
+    const trashIconSVG = `<svg viewBox="0 0 24 24"><path d="M9,3V4H4V6H5V19C5,20.1 5.9,21 7,21H17C18.1,21 19,20.1 19,19V6H20V4H15V3H9M7,19V6H17V19H7M9,8H11V17H9V8M13,8H15V17H13V8Z" /></svg>`;
 
     const srtToVtt = srtText => `WEBVTT\n\n${srtText.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2').replace(/^\d+\s*$/gm, '')}`;
     const assToVtt = assText => {
@@ -770,21 +873,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
-    // -- MODIFIED START: Unified function to get video ID (URL for online, name for offline)
     const getCurrentVideoId = () => {
-        // Online videos are identified by their full URL
         if (video.src && !video.src.startsWith('blob:')) {
             return video.src;
         }
-        // Offline videos are identified by their file name
         if (currentVideoIndex >= 0 && loadedVideos[currentVideoIndex]) {
             return loadedVideos[currentVideoIndex].name;
         }
         return null;
     };
-    // -- MODIFIED END
-
-    // -- MODIFIED START: Uses unified ID for saving playback position
+    
     const savePlaybackPosition = () => {
         const videoId = getCurrentVideoId();
         if (!videoId) return;
@@ -795,9 +893,7 @@ document.addEventListener('DOMContentLoaded', () => {
              localStorage.setItem(videoId, video.currentTime);
         }
     };
-    // -- MODIFIED END
-
-    // -- MODIFIED START: Uses unified ID to check for saved position
+    
     const checkForSavedPosition = () => {
         const videoId = getCurrentVideoId();
         if (!videoId) return;
@@ -830,7 +926,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(hideToast, 8000);
         }
     };
-    // -- MODIFIED END
     
     const updateSubtitles = currentTime => {
         const findCue = cues => cues.find(cue => currentTime >= cue.start && currentTime <= cue.end);
@@ -874,7 +969,7 @@ document.addEventListener('DOMContentLoaded', () => {
             populatePlaylistUI();
         }
 
-        loadedSubtitles = await Promise.all(subtitleFiles.map(file => new Promise(resolve => {
+        const newSubtitles = await Promise.all(subtitleFiles.map(file => new Promise(resolve => {
             const reader = new FileReader();
             reader.onload = event => {
                 let vttContent = file.name.endsWith('.srt') ? srtToVtt(event.target.result) : file.name.endsWith('.ass') ? assToVtt(event.target.result) : event.target.result;
@@ -882,6 +977,8 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             reader.readAsText(file);
         })));
+        
+        loadedSubtitles.push(...newSubtitles);
         updateSubtitleSelectors();
         if (currentVideoIndex === -1 && loadedVideos.length > 0) loadVideo(0); 
     };
@@ -896,7 +993,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePlaylistHighlight();
         updateNavButtons();
         autoSelectSubtitlesForCurrentVideo();
-        // -- MODIFIED: The check for saved position is now handled by a global 'loadedmetadata' event listener
     };
 
     const autoSelectSubtitlesForCurrentVideo = () => {
@@ -958,29 +1054,110 @@ document.addEventListener('DOMContentLoaded', () => {
     dropZone.addEventListener('dragleave', e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
     dropZone.addEventListener('drop', e => { e.preventDefault(); handleFileDrop(e.dataTransfer.files); });
 
+    const playOnlineVideo = (url, name) => {
+        try {
+            new URL(url);
+            loadedVideos = []; 
+            currentVideoIndex = -1;
+            populatePlaylistUI();
+            updateNavButtons();
+            loadedSubtitles = []; 
+            updateSubtitleSelectors();
+
+            video.src = url;
+            video.load();
+            video.play().catch(e => console.error("Online video playback failed:", e));
+            
+            onlineLinkContainer.classList.add('hidden');
+            dropZone.classList.add('hidden');
+
+            // History management
+            const existingEntryIndex = onlineVideoHistory.findIndex(item => item.url === url);
+            if (existingEntryIndex !== -1) {
+                 onlineVideoHistory.splice(existingEntryIndex, 1);
+            }
+            const videoName = name || url.substring(url.lastIndexOf('/') + 1) || 'ویدیوی آنلاین';
+            onlineVideoHistory.unshift({ url: url, name: videoName });
+             if (onlineVideoHistory.length > 50) { // Limit history size
+                onlineVideoHistory.pop();
+            }
+            localStorage.setItem('onlineVideoHistory', JSON.stringify(onlineVideoHistory));
+            populateHistoryUI();
+
+        } catch (error) {
+            alert('لطفا یک آدرس اینترنتی معتبر وارد کنید.');
+            console.error("Invalid URL:", error);
+        }
+    };
+
     playOnlineLinkBtn.addEventListener('click', () => {
         const videoUrl = onlineLinkInput.value.trim();
-        if (videoUrl) {
-            try {
-                new URL(videoUrl);
-                loadedVideos = []; 
-                currentVideoIndex = -1;
-                populatePlaylistUI();
-                updateNavButtons();
-                loadedSubtitles = []; 
-                updateSubtitleSelectors();
+        if (videoUrl) playOnlineVideo(videoUrl);
+    });
+    
+    selectFilesBtn.addEventListener('click', () => localFileInput.click());
+    localFileInput.addEventListener('change', (e) => handleFileDrop(e.target.files));
 
-                video.src = videoUrl;
-                video.load();
-                video.play().catch(e => console.error("Online video playback failed:", e));
-                
-                onlineLinkContainer.classList.add('hidden');
-                dropZone.classList.add('hidden');
-            } catch (error) {
-                alert('لطفا یک آدرس اینترنتی معتبر وارد کنید.');
-                console.error("Invalid URL:", error);
+    const populateHistoryUI = () => {
+        historyPanel.innerHTML = '';
+        const header = document.createElement('div');
+        header.id = 'history-panel-header';
+        header.innerHTML = `<h3>تاریخچه</h3>`;
+
+        const clearBtn = document.createElement('button');
+        clearBtn.id = 'clear-history-btn';
+        clearBtn.title = 'حذف کل تاریخچه';
+        clearBtn.innerHTML = trashIconSVG;
+        clearBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (confirm('آیا از حذف کل تاریخچه مطمئن هستید؟')) {
+                onlineVideoHistory = [];
+                localStorage.removeItem('onlineVideoHistory');
+                populateHistoryUI();
             }
+        });
+
+        header.appendChild(clearBtn);
+        historyPanel.appendChild(header);
+
+        if(onlineVideoHistory.length === 0) {
+            historyPanel.innerHTML += '<p style="text-align:center; opacity: 0.7;">تاریخچه‌ای وجود ندارد.</p>';
+            return;
         }
+
+        onlineVideoHistory.forEach((item, index) => {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <span class="link">${item.url}</span>
+                <span class="name">${item.name}</span>
+            `;
+            historyItem.addEventListener('click', () => {
+                playOnlineVideo(item.url, item.name);
+                historyPanel.classList.remove('visible');
+            });
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-history-item-btn';
+            deleteBtn.innerHTML = '&times;';
+            deleteBtn.title = 'حذف این مورد';
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                onlineVideoHistory.splice(index, 1);
+                localStorage.setItem('onlineVideoHistory', JSON.stringify(onlineVideoHistory));
+                populateHistoryUI();
+            });
+
+            historyItem.appendChild(deleteBtn);
+            historyPanel.appendChild(historyItem);
+        });
+    };
+
+    historyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playlistPanel.classList.remove('visible');
+        historyPanel.classList.toggle('visible');
+        playerContainer.classList.remove('playlist-active');
     });
 
     video.addEventListener('play', () => { 
@@ -1006,12 +1183,10 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTimeDisplay();
         updateSubtitles(video.currentTime);
     });
-    // -- MODIFIED START: Centralized 'loadedmetadata' handler for both online and offline videos
     video.addEventListener('loadedmetadata', () => {
         updateTimeDisplay();
         checkForSavedPosition();
     });
-    // -- MODIFIED END
     video.addEventListener('volumechange', () => {
         const volumePercent = video.muted ? 0 : video.volume * 100;
         volumeFilled.style.width = `${volumePercent}%`;
@@ -1025,6 +1200,7 @@ document.addEventListener('DOMContentLoaded', () => {
     prevBtn.addEventListener('click', () => loadVideo(currentVideoIndex + 1));
     playlistBtn.addEventListener('click', e => {
         e.stopPropagation();
+        historyPanel.classList.remove('visible');
         const isVisible = playlistPanel.classList.toggle('visible');
         playerContainer.classList.toggle('playlist-active', isVisible);
     });
@@ -1072,6 +1248,36 @@ document.addEventListener('DOMContentLoaded', () => {
         video.muted = false;
         video.volume = Math.max(0, Math.min(1, video.volume - (e.deltaY > 0 ? 0.05 : -0.05)));
     });
+    
+    // Double Tap/Click functionality
+    let lastTap = 0;
+    playerContainer.addEventListener('click', e => {
+        if (controlsContainer.contains(e.target) || 
+            onlineLinkContainer.contains(e.target) || 
+            settingsPanel.contains(e.target) ||
+            resumeToast.contains(e.target)) {
+            return;
+        }
+        
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTap;
+        
+        if (tapLength < 300 && tapLength > 0) {
+            const rect = playerContainer.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const third = rect.width / 3;
+
+            if (clickX < third) {
+                video.currentTime -= 10;
+            } else if (clickX > rect.width - third) {
+                video.currentTime += 10;
+            } else {
+                video.paused ? video.play() : video.pause();
+            }
+            e.preventDefault();
+        }
+        lastTap = currentTime;
+    });
 
     const adjustFontSize = (slider, increase) => {
         const change = increase ? 1 : -1;
@@ -1086,7 +1292,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentScale = parseFloat(getComputedStyle(root).getPropertyValue(cssVar));
             const step = 0.02;
             let newScale = e.key === keyPlus ? currentScale + step : currentScale - step;
-            newScale = Math.max(0.7, Math.min(1.4, newScale)); // Clamp scale between 70% and 140%
+            newScale = Math.max(0.7, Math.min(1.4, newScale));
             root.style.setProperty(cssVar, newScale.toFixed(2));
             saveSettings();
         }
@@ -1098,7 +1304,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const key = e.key.toLowerCase();
         pressedKeys.add(key);
 
-        // Shortcuts for dynamic panel scaling
         if (e.ctrlKey && e.altKey) {
             handlePanelScale(e, '+', '-', '--controls-scale');
             return;
@@ -1123,7 +1328,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // MODIFIED: Shortcut to reset panel sizes using a key combination
         const resetPanelsCombination = (pressedKeys.has(',') && pressedKeys.has('.')) || (pressedKeys.has('و') && pressedKeys.has('.'));
         if (resetPanelsCombination) {
             e.preventDefault();
@@ -1134,8 +1338,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-
-        // Subtitle positioning logic
         if (e.ctrlKey) {
             if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
                 e.preventDefault();
@@ -1165,10 +1367,7 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'arrowdown': video.volume = Math.max(0, video.volume - 0.1); break;
             case 'n': if(!nextBtn.disabled) nextBtn.click(); break;
             case 'b': if(!prevBtn.disabled) prevBtn.click(); break;
-            case 'f':
-            case 'ب':
-                fullscreenBtn.click();
-                break;
+            case 'f': case 'ب': fullscreenBtn.click(); break;
             case 'p': pipBtn.click(); break;
             case 'c': case 'ز': video.playbackRate = Math.min(4, video.playbackRate + 0.1); break;
             case 'x': case 'ط': video.playbackRate = Math.max(0.1, video.playbackRate - 0.1); break;
@@ -1291,6 +1490,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (settingsPanel.style.display === 'block' && !settingsPanel.contains(e.target) && !settingsBtn.contains(e.target)) {
             settingsPanel.style.display = 'none';
         }
+        if (historyPanel.classList.contains('visible') && !historyPanel.contains(e.target) && e.target !== historyBtn && !historyBtn.contains(e.target)) {
+            historyPanel.classList.remove('visible');
+        }
+         if (playlistPanel.classList.contains('visible') && !playlistPanel.contains(e.target) && e.target !== playlistBtn && !playlistBtn.contains(e.target)) {
+            playlistPanel.classList.remove('visible');
+            playerContainer.classList.remove('playlist-active');
+        }
     });
 
     window.addEventListener('beforeunload', () => { 
@@ -1305,6 +1511,7 @@ document.addEventListener('DOMContentLoaded', () => {
         volumeFilled.style.width = `${video.volume * 100}%`;
         updateNavButtons();
         loadSettings();
+        populateHistoryUI();
     };
     init();
 });
